@@ -1,0 +1,9 @@
+﻿Alright, let me guide you through using me effectively. To interact, simply use voice commands. In this version, the available commands are limited to: 'Can you find in Google', 'open program', 'Stop recognition', 'Save Settings'.
+
+When you say 'Can you find in Google', you can follow up with your search query, and I'll open Google to find it for you.
+
+For 'open program', just mention the name of the program. But remember, you need to add the program to your settings first.
+
+To access 'Save Settings', simply say the word, and the settings form will pop up. Here, you can adjust various configurations to suit your preferences.
+
+Lastly, 'Stop recognition' is used to exit the program altogether.

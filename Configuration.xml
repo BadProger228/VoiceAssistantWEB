@@ -1,0 +1,13 @@
+<Settings>
+  <VoiceSpeed>4</VoiceSpeed>
+  <VoiceGender>1</VoiceGender>
+  <VoiceAge>30</VoiceAge>
+  <OpenCommand>
+    <programName>Telegram</programName>
+    <pathToFile>C:\Users\LogicMan\AppData\Roaming\Telegram Desktop\Telegram.exe</pathToFile>
+  </OpenCommand>
+  <OpenCommand>
+    <programName>Logical</programName>
+    <pathToFile>C:\Users\LogicMan\AppData\Local\Programs\Microsoft VS Code\Code.exe</pathToFile>
+  </OpenCommand>
+</Settings>
