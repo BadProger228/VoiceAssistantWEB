@@ -1,0 +1,40 @@
+﻿
+@model AllPageConfiguration
+@using System.Speech.Synthesis
+@using Testing_for_WEB.Controllers
+@using static KursovWork.VoiceAssistant
+
+<html>
+    <body>
+        <header>
+            <div class="row mt-5">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h2>Program List</h2>
+                        <select id="ProgramList" class="form-control" size="5">
+                            Model = HomeController.Index();
+                            @foreach (var program in Model.ProgramList)
+                            {
+                                <option value="@program.FileName">@program.FileName</option>
+                            }
+                        </select>
+                        <div id="DeleteMessage" style="color: red;"></div>
+                        <button id="DeleteItem" class="btn btn-danger mt-2">Delete selected program</button>
+                    </div>
+
+                    <div class="col-md-6">
+                        <form method="post" action="/Home/AddProgram">
+                            <h2>Add Program</h2>
+                            <label for="NameProgram">Name:</label>
+                            <input type="text" name="NameProgram" class="form-control mb-2">
+                            <label for="pathToProgram">Path:</label>
+                            <input type="text" name="pathToProgram" class="form-control mb-2">
+                            <div id="AddProgramMessage"></div>
+                            <button onclick="this.form.submit()" id="AddOpenProgram" class="btn btn-primary">Add Program</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </header>
+    </body>
+</html>

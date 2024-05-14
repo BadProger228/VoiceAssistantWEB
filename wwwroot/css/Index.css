@@ -1,0 +1,59 @@
+﻿body {
+    margin: 0;
+    padding: 0;
+    font-family: Berlian Sans FB, sans-serif;
+    background-color: #1a1a1a; /* Темный фон */
+    color: #fff; /* Белый текст */
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 20px;
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+    nav ul li {
+        display: inline;
+        margin-right: 20px;
+    }
+
+        nav ul li a {
+            text-decoration: none;
+            color: #00bfff; /* Голубая обводка */
+            border: 1px solid #00bfff; /* Голубая обводка */
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+            nav ul li a:hover {
+                background-color: #00bfff; /* Голубая обводка при наведении */
+                color: #fff; /* Белый текст при наведении */
+            }
+
+/* Добавьте стили для контента на вкладках, таких как "Настройки" и "Программы" */
+
+footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #333; /* Цвет фона */
+    padding: 20px 0; /* Отступы сверху и снизу */
+    text-align: center; /* Выравнивание текста по центру */
+    color: #fff; /* Цвет текста */
+    font-family: Berlian Sans FB, sans-serif; /* Установка шрифта */
+}
+}
