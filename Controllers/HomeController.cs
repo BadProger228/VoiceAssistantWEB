@@ -27,8 +27,7 @@ namespace Testing_for_WEB.Controllers
             _voiceAssistant = voiceAssistant;
         }
 
-        [HttpGet]
-        public IActionResult Index()
+        public AllPageConfiguration DataWebSite()
         {
             VoiceGender voiceGender = new();
             VoiceAge voiceAge = new();
@@ -43,10 +42,39 @@ namespace Testing_for_WEB.Controllers
                 Age = voiceAge,
                 Gender = voiceGender
             };
-         
-            return View(viewModel);
+
+            return viewModel;
         }
 
+        [HttpGet]
+        public IActionResult Index()
+        {
+            return View(DataWebSite());
+        }
+        public IActionResult AddProgramForm()
+        {
+            return View(DataWebSite());
+        }
+        public IActionResult Settings()
+        {
+            return View(DataWebSite()); 
+        }
+
+        public IActionResult RedirectToPage(string button)
+        {
+            if (button == "settings")
+            {
+                return RedirectToAction("Settings");
+            }
+            else if (button == "Add programs")
+            {
+                return RedirectToAction("AddProgramForm");
+            }
+            else
+            {
+                return RedirectToAction("Index");
+            }
+        }
         public IActionResult AddProgram(string NameProgram, string pathToProgram)
         {
             if(_voiceAssistant.SetOpenCommand(NameProgram, pathToProgram))
@@ -91,6 +119,6 @@ namespace Testing_for_WEB.Controllers
         {
             List<OpenCommand> programList = _voiceAssistant?.openCommands ?? new List<OpenCommand>();
             return View(programList);
-        }   
+        }
     }
 }

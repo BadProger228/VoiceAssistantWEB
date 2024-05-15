@@ -1,0 +1,49 @@
+﻿@model AllPageConfiguration
+@using System.Speech.Synthesis
+@using Testing_for_WEB.Controllers
+@using static KursovWork.VoiceAssistant
+
+<html>
+    <body>
+        <header>
+            <div class="row mt-5">
+                <form metod="post" action="/Home/ChangeVoiceConf">
+                    <h2>Voice Settings</h2>
+                    <label for="SpeedValue">Speed:</label>
+                    <input type="range" name="Speed" class="form-control" min="-10" max="10" onchange="this.form.submit()" value="@Model.Speed">
+                    <label for="AgeValue">Age:</label>
+                    <select name="Age" class="form-control" onchange="this.form.submit()">
+                        @foreach (var value in Enum.GetValues(typeof(VoiceAge)))
+                        {
+                            <option value="@value">@value</option>
+                            if (value.ToString() == Model.Age.ToString())
+                            {
+                                <script>
+                                    document.getElementsByName("Age")[0].value = "@Model.Age";
+                                </script>
+                            }
+                        }
+                    </select>
+                    <label for="GenderValue">Gender:</label>
+                    <select name="Gender" class="form-control" onchange="this.form.submit()">
+                        @foreach (var value in Enum.GetValues(typeof(VoiceGender)))
+                        {
+                            <option value="@value">@value</option>
+                            if (value.ToString() == Model.Gender.ToString())
+                            {
+                                <script>
+                                    document.getElementsByName("Gender")[0].value = "@Model.Gender";
+                                </script>
+                            }
+                        }
+                    </select>
+                </form>
+                <form method="post" action="/Home/Testing">
+                    <h2>Testing of voice</h2>
+                    <input type="text" name="text">
+                    <input type="submit" value='Test' />
+                </form>
+            </div>
+        </header>
+    </body>
+</html>
