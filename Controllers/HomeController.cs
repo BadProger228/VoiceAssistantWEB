@@ -77,6 +77,10 @@ namespace Testing_for_WEB.Controllers
         }
         public IActionResult AddProgram(string NameProgram, string pathToProgram)
         {
+            foreach (var item in _voiceAssistant.openCommands)
+                if(item.FileName == NameProgram)
+                    return NoContent();
+            
             if(_voiceAssistant.SetOpenCommand(NameProgram, pathToProgram))
                 return NoContent();
             return NoContent();

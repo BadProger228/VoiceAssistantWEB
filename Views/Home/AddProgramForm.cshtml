@@ -1,40 +1,253 @@
-﻿
-@model AllPageConfiguration
+﻿@model AllPageConfiguration
 @using System.Speech.Synthesis
 @using Testing_for_WEB.Controllers
 @using static KursovWork.VoiceAssistant
 
+<!DOCTYPE html>
 <html>
-    <body>
-        <header>
+<head>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Berlian Sans FB, sans-serif;
+            background-color: #1a1a1a;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        ul {
+            padding: 0;
+            margin: 0;
+        }
+
+            ul li {
+                list-style: none;
+                margin-bottom: 5px;
+            }
+
+        .delete-btn, .add-btn {
+            background-color: transparent;
+            color: #00bfff;
+            border: 1px solid #00bfff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            display: block;
+            margin-bottom: 20px;
+        }
+
+            .delete-btn:hover, .add-btn:hover {
+                background-color: #00bfff;
+                color: #fff;
+            }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"] {
+            width: calc(100% - 22px);
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+            button:hover {
+                background-color: #333;
+            }
+
+        input[type=text] {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            box-sizing: border-box;
+            border: 1px solid #00bfff;
+            border-radius: 5px;
+            background-color: transparent;
+            color: #fff;
+        }
+
+        .dropbtn {
+            background-color: transparent;
+            color: #00bfff;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #00bfff;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+
+            .dropbtn:hover {
+                background-color: #00bfff;
+                color: #fff;
+                transition: background-color 0.3s, color 0.3s; /* Добавлено правило transition */
+            }
+
+        #ProgramList {
+            background-color: #00bfff; /* Голубой фон */
+            color: #fff; /* Белый текст */
+            height: 165px;
+        }
+
+            #ProgramList option {
+                background-color: #00bfff; /* Голубой фон */
+                color: #fff; /* Белый текст */
+            }
+
+        .delete-btn {
+            margin-top: 8px; /* Отступ сверху */
+            font-size: 16px; /* Размер шрифта */
+            padding: 7px; /* Внутренние отступы */
+            border: 1px solid #00bfff;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
             <div class="row mt-5">
                 <div class="row">
                     <div class="col-md-6">
                         <h2>Program List</h2>
-                        <select id="ProgramList" class="form-control" size="5">
-                            Model = HomeController.Index();
-                            @foreach (var program in Model.ProgramList)
-                            {
-                                <option value="@program.FileName">@program.FileName</option>
-                            }
-                        </select>
-                        <div id="DeleteMessage" style="color: red;"></div>
-                        <button id="DeleteItem" class="btn btn-danger mt-2">Delete selected program</button>
+                        <form method="post" action="/Home/DeleteProgram" id="deleteForm">
+                            <select id="ProgramList" class="form-control" size="5" name="NameProgram">
+                                @foreach (var program in Model.ProgramList)
+                                {
+                                    <option value="@program.FileName">@program.FileName</option>
+                                }
+                            </select>
+                            <div id="DeleteMessage"></div>
+                            <button type="submit" class="dropbtn delete-btn" id="DeleteItem">Delete selected program</button>
+                        </form>
                     </div>
 
                     <div class="col-md-6">
                         <form method="post" action="/Home/AddProgram">
                             <h2>Add Program</h2>
                             <label for="NameProgram">Name:</label>
-                            <input type="text" name="NameProgram" class="form-control mb-2">
+                            <input type="text" name="NameProgram">
                             <label for="pathToProgram">Path:</label>
-                            <input type="text" name="pathToProgram" class="form-control mb-2">
+                            <input type="text" name="pathToProgram">
                             <div id="AddProgramMessage"></div>
-                            <button onclick="this.form.submit()" id="AddOpenProgram" class="btn btn-primary">Add Program</button>
+                            <button class="dropbtn" onclick="this.form.submit()" id="AddOpenProgram">Add Program</button>
                         </form>
                     </div>
                 </div>
             </div>
-        </header>
-    </body>
+        </div>
+    </header>
+    <script type="text/javascript">
+        document.getElementById("DeleteItem").addEventListener("click", function () {
+            var programList = document.getElementById("ProgramList");
+            var selectedOption = programList.options[programList.selectedIndex];
+            var errorMessageDiv = document.getElementById("DeleteMessage");
+
+            if (selectedOption) {
+                var fileName = selectedOption.value;
+
+                selectedOption.remove();
+
+                fetch('/Home/DeleteProgram?NameProgram=' + fileName, {
+                    method: 'POST'
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            console.log('Program deleted successfully');
+                            errorMessageDiv.textContent = '';
+                        } else {
+                            console.error('Error deleting program');
+                            errorMessageDiv.textContent = 'Error deleting program';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error deleting program:', error);
+                        errorMessageDiv.textContent = 'Error deleting program: ' + error;
+                    });
+            } else {
+                console.log('No program selected');
+                errorMessageDiv.textContent = 'No program selected';
+            }
+        });
+    </script>
+    <script type="text/javascript">
+        document.getElementById("AddOpenProgram").addEventListener("click", function (event) {
+            event.preventDefault();
+
+            var nameProgramInput = document.querySelector('input[name="NameProgram"]');
+            var nameProgramValue = nameProgramInput.value;
+
+            var pathToProgramInput = document.querySelector('input[name="pathToProgram"]');
+            var pathToProgramValue = pathToProgramInput.value;
+
+            var messageLabel = document.getElementById("AddProgramMessage");
+            messageLabel.innerHTML = '';
+
+            if (nameProgramValue.trim() !== "") {
+                var programList = document.getElementById("ProgramList");
+                var existingOptions = programList.querySelectorAll('option');
+                var isDuplicate = Array.from(existingOptions).some(function (option) {
+                    return option.value === nameProgramValue;
+                });
+
+                if (!isDuplicate) {
+                    var newOption = document.createElement('option');
+                    newOption.value = nameProgramValue;
+                    newOption.textContent = nameProgramValue;
+                    programList.appendChild(newOption);
+
+                    nameProgramInput.value = '';
+                    pathToProgramInput.value = '';
+                    var successMessage = document.createElement('div');
+                    successMessage.textContent = 'Program added successfully';
+                    successMessage.style.color = 'green';
+                    messageLabel.appendChild(successMessage);
+                } else {
+                    var errorMessage = document.createElement('div');
+                    errorMessage.textContent = 'Program with this name already exists';
+                    errorMessage.style.color = 'red';
+                    messageLabel.appendChild(errorMessage);
+                }
+            } else {
+                var errorMessage = document.createElement('div');
+                errorMessage.textContent = 'Please enter a program name';
+                errorMessage.style.color = 'red';
+                messageLabel.appendChild(errorMessage);
+            }
+        });
+    </script>
+</body>
 </html>
+

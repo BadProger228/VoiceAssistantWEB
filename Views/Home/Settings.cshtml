@@ -3,47 +3,179 @@
 @using Testing_for_WEB.Controllers
 @using static KursovWork.VoiceAssistant
 
+<!DOCTYPE html>
 <html>
-    <body>
-        <header>
-            <div class="row mt-5">
-                <form metod="post" action="/Home/ChangeVoiceConf">
-                    <h2>Voice Settings</h2>
-                    <label for="SpeedValue">Speed:</label>
-                    <input type="range" name="Speed" class="form-control" min="-10" max="10" onchange="this.form.submit()" value="@Model.Speed">
-                    <label for="AgeValue">Age:</label>
-                    <select name="Age" class="form-control" onchange="this.form.submit()">
-                        @foreach (var value in Enum.GetValues(typeof(VoiceAge)))
-                        {
-                            <option value="@value">@value</option>
-                            if (value.ToString() == Model.Age.ToString())
-                            {
-                                <script>
-                                    document.getElementsByName("Age")[0].value = "@Model.Age";
-                                </script>
-                            }
-                        }
-                    </select>
-                    <label for="GenderValue">Gender:</label>
-                    <select name="Gender" class="form-control" onchange="this.form.submit()">
-                        @foreach (var value in Enum.GetValues(typeof(VoiceGender)))
-                        {
-                            <option value="@value">@value</option>
-                            if (value.ToString() == Model.Gender.ToString())
-                            {
-                                <script>
-                                    document.getElementsByName("Gender")[0].value = "@Model.Gender";
-                                </script>
-                            }
-                        }
-                    </select>
-                </form>
-                <form method="post" action="/Home/Testing">
-                    <h2>Testing of voice</h2>
-                    <input type="text" name="text">
-                    <input type="submit" value='Test' />
-                </form>
-            </div>
-        </header>
-    </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Title of the document</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Berlian Sans FB, sans-serif;
+            background-color: #1a1a1a;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center; /* Центрирование содержимого по горизонтали */
+            max-width: 400px; /* Изменено значение max-width */
+            width: 100%; /* Добавлено */
+            margin: 0 auto; /* Добавлено */
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .dropbtn {
+            background-color: transparent;
+            color: #00bfff;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #00bfff;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #2c2c2c;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.7);
+            z-index: 1;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown:hover .dropbtn {
+            background-color: #00bfff;
+            color: #fff;
+        }
+
+        input[type=range] {
+            width: 100%;
+            background: #00bfff; /* Цвет ползунка */
+        }
+
+        .slider-container {
+            margin-bottom: 20px;
+            width: 100%;
+            text-align: center;
+        }
+
+            .slider-container label {
+                color: #fff;
+                display: block; /* Разместить каждый лейбл на новой строке */
+            }
+
+        .test-btn {
+            background-color: transparent;
+            color: #00bfff;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: 1px solid #00bfff;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+            .test-btn:hover {
+                background-color: #00bfff;
+                color: #fff;
+            }
+
+        input[type=text] {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            box-sizing: border-box;
+            border: 1px solid #00bfff;
+            border-radius: 5px;
+            background-color: transparent;
+            color: #fff;
+        }
+
+        /* Стили для селектов */
+        select {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            box-sizing: border-box;
+            border: 1px solid #00bfff;
+            border-radius: 5px;
+            background-color: transparent;
+            color: #fff;
+        }
+
+            /* Стили для выпадающего списка */
+            select option {
+                background-color: #00bfff; /* Фон */
+                color: #fff; /* Цвет текста */
+            }
+
+    </style>
+</head>
+<body>
+    <form method="post" action="/Home/ChangeVoiceConf">
+        <h2>Voice Settings</h2>
+        <div class="slider-container">
+            <label for="SpeedValue">Speed:</label>
+            <input type="range" name="Speed" min="-10" max="10" onchange="this.form.submit()" value="@Model.Speed">
+        </div>
+        <div class="select-container">
+            <label for="AgeValue">Age:</label>
+            <select name="Age" onchange="this.form.submit()">
+                @foreach (var value in Enum.GetValues(typeof(VoiceAge)))
+                {
+                    <option value="@value">@value</option>
+                    @if (value.ToString() == Model.Age.ToString())
+                    {
+                        <script>
+                            document.getElementsByName("Age")[0].value = "@Model.Age";
+                        </script>
+                    }
+                }
+            </select>
+        </div>
+        <div class="select-container">
+            <label for="GenderValue">Gender:</label>
+            <select name="Gender" onchange="this.form.submit()">
+                @foreach (var value in Enum.GetValues(typeof(VoiceGender)))
+                {
+                    <option value="@value">@value</option>
+                    @if (value.ToString() == Model.Gender.ToString())
+                    {
+                        <script>
+                            document.getElementsByName("Gender")[0].value = "@Model.Gender";
+                        </script>
+                    }
+                }
+            </select>
+        </div>
+        <form method="post" action="/Home/Testing">
+            <h2>Testing of voice</h2>
+            <input type="text" name="text">
+            <input type="submit" value="Test" class="test-btn" formaction="/Home/Testing">
+        </form>
+    </form>
+</body>
 </html>
