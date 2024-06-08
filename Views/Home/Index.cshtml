@@ -1,68 +1,15 @@
-﻿<!DOCTYPE html>
+﻿@model AllPageConfiguration
+@using System.Speech.Synthesis
+@using Testing_for_WEB.Controllers
+@using static KursovWork.VoiceAssistant
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="stylesheet" type="text/css" href="/css/Index.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Voice Assistant Website</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: Berlian Sans FB, sans-serif;
-            background-color: #1a1a1a;
-            color: #fff;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 20px;
-        }
-
-        nav ul {
-            list-style-type: none;
-            padding: 0;
-            margin: 0;
-        }
-
-            nav ul li {
-                display: inline;
-                margin-right: 20px;
-            }
-
-                nav ul li a {
-                    text-decoration: none;
-                    color: #00bfff;
-                    border: 1px solid #00bfff;
-                    padding: 5px 10px;
-                    border-radius: 5px;
-                }
-
-                    nav ul li a:hover {
-                        background-color: #00bfff;
-                        color: #fff;
-                    }
-
-
-        footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background-color: #333;
-            padding: 20px 0;
-            text-align: center;
-            color: #fff;
-            font-family: Berlian Sans FB, sans-serif;
-        }
-    </style>
 </head>
 <body>
     <div class="container">
@@ -75,10 +22,15 @@
                 </ul>
             </nav>
         </header>
+        <div class="text-content">
+            <p>Just say HELP if you need explain</p>
+            <p>Commands: </p>
+            <p>- can you find in Google => search in google that you will say</p>
+            <p>- open program => program ask name of program that you want to open => open program if you add it</p>
+        </div>
     </div>
     <footer>
         <p>This Voice Assistant can help you open apps through voice input.</p>
     </footer>
 </body>
 </html>
-

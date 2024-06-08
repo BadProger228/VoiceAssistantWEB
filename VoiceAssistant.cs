@@ -22,14 +22,12 @@ namespace KursovWork
 {
     public class VoiceAssistant
     {
-        private Action<bool> ChangeVisible;
+        private ActivateSound? activateSound;
         private SpeechRecognitionEngine recognizer = new();
         private SpeechRecognitionEngine recognizerQuery;
         private SpeechSynthesizer synth = new();
         public List<OpenCommand> openCommands { get; set; }
         private Action<string> command;
-        private WaveOutEvent outputDevice;
-        private AudioFileReader audioFile;
         private bool _isStarted = false;
         private string pathToConfig;
         public class OpenCommand
@@ -47,6 +45,30 @@ namespace KursovWork
                 return FileName + ", " + Path;
             }
         }
+        private class ActivateSound
+        {
+            string _path;
+            public ActivateSound(string path)
+            {
+                if (!File.Exists(path))
+                    return;
+             
+                _path = path;
+            }
+            public void Play()
+            {
+                using (var audioFile = new AudioFileReader(_path))
+                using (var outputDevice = new WaveOutEvent())
+                {
+                    outputDevice.Init(audioFile);
+                    outputDevice.Play();
+
+                    while (outputDevice.PlaybackState == PlaybackState.Playing)
+                        Thread.Sleep(1000);
+                    
+                }
+            }
+        }
         public bool SetOpenCommand(string NameProgram, string pathToProgram)
         {
             if (NameProgram == null || NameProgram == string.Empty) 
@@ -60,45 +82,43 @@ namespace KursovWork
             return true;
         }
         
-        public VoiceAssistant(Action<bool> changeVisible)
+        public VoiceAssistant()
         {
-            OpenConfiguration(Directory.GetCurrentDirectory() + "\\Configuration.xml");
-            ChangeVisible = changeVisible;
+            OpenConfiguration(Directory.GetCurrentDirectory());
+            
         }
-        public VoiceAssistant(string configPath, Action<bool> changeVisible)
+        public VoiceAssistant(string projectPath)
         {
-            OpenConfiguration(configPath);
-            pathToConfig = configPath;
-            ChangeVisible = changeVisible;
+            OpenConfiguration(projectPath);
+            pathToConfig = projectPath;
+            
         }
         
-        public void Start()
+        public async void Start()
         {
+            await Task.Run(() => { 
 
-            if (_isStarted)
-                return;
-            else
-                _isStarted = true;
-            
-            
+                if (_isStarted)
+                    return;
+                else
+                    _isStarted = true;
 
-            outputDevice.Play();
-
-
-
-            var grammarBuilder = new GrammarBuilder();
-            grammarBuilder.Append(new Choices("Can you find in Google", "Stop recognition", "open program", "Save settings", "Help"));
-            var grammar = new Grammar(grammarBuilder);
-            recognizer.LoadGrammar(grammar);
-            recognizer.SetInputToDefaultAudioDevice();
-            recognizer.SpeechRecognized += RecognizerCommand_SpeechRecognized;
-            recognizer.RecognizeAsync(RecognizeMode.Multiple);
+                var grammarBuilder = new GrammarBuilder();
+                grammarBuilder.Append(new Choices("Can you find in Google", "Stop recognition", "open program", "Save settings", "Help"));
+                var grammar = new Grammar(grammarBuilder);
+                recognizer.LoadGrammar(grammar);
+                recognizer.SetInputToDefaultAudioDevice();
+                recognizer.SpeechRecognized += RecognizerCommand_SpeechRecognized;
+                recognizer.RecognizeAsync(RecognizeMode.Multiple);
 
             
-            DefaultRecognizerQuery();
+                DefaultRecognizerQuery();
 
-            synth.Speak("Hi, I'm your voice assistant. If you need help for use me just say help");
+                synth.Speak("Hi, I'm your voice assistant. If you need help for use me just say help");
 
+                activateSound.Play();
+            
+            });
         }
         public void TestSpeach(string text) => synth.Speak(text);
 
@@ -125,19 +145,16 @@ namespace KursovWork
                 synth.Rate = voiceSpeed;   
         }
 
-        private void OpenConfiguration(string configPath)
+        private void OpenConfiguration(string projectPath)
         {
 
-
-            outputDevice = new WaveOutEvent();
-            audioFile = new AudioFileReader(Directory.GetCurrentDirectory() + "\\Sounds\\Activate Voice.mp3");
-            outputDevice.Init(audioFile);
+            activateSound = new(projectPath + "\\Sounds\\Activate Voice.mp3");
 
             openCommands = new();
             try
             {
                 XmlDocument xmlDoc = new XmlDocument();
-                xmlDoc.Load(configPath);
+                xmlDoc.Load(projectPath + "\\Configuration.xml");
 
                 XmlNode settingsNode = xmlDoc.SelectSingleNode("/Settings");
                 int voiceGender = int.Parse(settingsNode.SelectSingleNode("VoiceGender").InnerText);
@@ -200,7 +217,7 @@ namespace KursovWork
 
                 recognizer.RecognizeAsyncCancel();
                 synth.Speak("Yeah, search in Google");
-                outputDevice.Play();
+                activateSound.Play();
                 command = SearchInGoogle;
                 recognizerQuery.RecognizeAsync(RecognizeMode.Multiple);
             }
@@ -208,7 +225,7 @@ namespace KursovWork
             {
                 recognizer.RecognizeAsyncCancel();
                 synth.Speak("Yes, what do you want to open");
-                outputDevice.Play();
+                activateSound.Play();
                 command = OpenProgram;
                 AddChoicesForQuery();
                 recognizerQuery.RecognizeAsync(RecognizeMode.Multiple);
@@ -264,7 +281,7 @@ namespace KursovWork
                 rootElement.AppendChild(openCommandElement);
             }
 
-            xmlDoc.Save(pathToConfig);
+            xmlDoc.Save(pathToConfig + "\\Configuration.xml");
         }
 
 
@@ -287,9 +304,12 @@ namespace KursovWork
                 if (program.FileName == programName)
                 {
                     if (File.Exists(program.Path))
+                    {
                         Process.Start(program.Path);
+                        synth.Speak("Program opend");
+                    }
                     else
-                        Console.WriteLine("Didn't find the program");
+                        synth.Speak("Didn't find the program");
 
                     break;
                 }

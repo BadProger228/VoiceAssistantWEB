@@ -10,4 +10,8 @@
     <programName>Logical</programName>
     <pathToFile>C:\Users\LogicMan\AppData\Local\Programs\Microsoft VS Code\Code.exe</pathToFile>
   </OpenCommand>
+  <OpenCommand>
+    <programName>Discord</programName>
+    <pathToFile>C:\Users\LogicMan\AppData\Local\Discord\Update.exe</pathToFile>
+  </OpenCommand>
 </Settings>
