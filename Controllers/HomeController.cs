@@ -39,6 +39,9 @@ namespace Testing_for_WEB.Controllers
         {
             if (Password != ConfirmPassword)
                 return NoContent();
+            else if(Password.Length <= 4)
+                return NoContent();
+
 
             _serverConnect.AddUser(Username, Password, SetDefoultValueForVoiceAssistant());
             _voiceAssistant.SetConfiguration(_serverConnect.SignIn(Username, Password));
@@ -160,7 +163,11 @@ namespace Testing_for_WEB.Controllers
         }
         public IActionResult Login(string Login, string Password)
         {
-            _voiceAssistant.SetConfiguration(_serverConnect.SignIn(Login, Password));
+            XmlDocument xmlDocument = _serverConnect.SignIn(Login, Password);
+            if (xmlDocument is null)
+                return NoContent();
+
+            _voiceAssistant.SetConfiguration(xmlDocument);
             _voiceAssistant.nameUser = Login;
             _voiceAssistant.Start();
             return RedirectToAction("main");

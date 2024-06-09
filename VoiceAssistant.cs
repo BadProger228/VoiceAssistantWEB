@@ -134,9 +134,8 @@ namespace KursovWork
         }
         public void ChangeSpeachConfiguration(VoiceGender voiceGender, VoiceAge voiceAge, int voiceSpeed)
         {
-            
-                synth.SelectVoiceByHints(voiceGender, voiceAge);
-                synth.Rate = voiceSpeed;   
+            synth.SelectVoiceByHints(voiceGender, voiceAge);
+            synth.Rate = voiceSpeed;
         }
 
         public void SetConfiguration(XmlDocument config)
@@ -266,7 +265,6 @@ namespace KursovWork
 
                 rootElement.AppendChild(openCommandElement);
             }
-
             return xmlDoc;
         }
 
