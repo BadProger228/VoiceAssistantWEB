@@ -11,8 +11,8 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddSingleton<VoiceAssistant>(sp =>
 {
-    var assistant = new VoiceAssistant(Directory.GetCurrentDirectory());
-    assistant.Start();
+    var assistant = new VoiceAssistant();
+    //assistant.Start();
     
     return assistant;
 });

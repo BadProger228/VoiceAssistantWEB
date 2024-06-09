@@ -17,6 +17,8 @@ using System.Xml;
 using static KursovWork.VoiceAssistant;
 using NAudio.Wave;
 using Microsoft.AspNetCore.Routing.Constraints;
+using System.Data.SqlTypes;
+using System.Xml.Linq;
 
 namespace KursovWork
 {
@@ -30,6 +32,8 @@ namespace KursovWork
         private Action<string> command;
         private bool _isStarted = false;
         private string pathToConfig;
+        public string nameUser { get; set; }
+        
         public class OpenCommand
         {
             public string FileName { get; set; }
@@ -40,10 +44,8 @@ namespace KursovWork
                 FileName = programName;
                 Path = pathToFile;
             }
-            public override string ToString()
-            {
-                return FileName + ", " + Path;
-            }
+            public override string ToString() => FileName + ", " + Path;
+            
         }
         private class ActivateSound
         {
@@ -82,17 +84,8 @@ namespace KursovWork
             return true;
         }
         
-        public VoiceAssistant()
-        {
-            OpenConfiguration(Directory.GetCurrentDirectory());
-            
-        }
-        public VoiceAssistant(string projectPath)
-        {
-            OpenConfiguration(projectPath);
-            pathToConfig = projectPath;
-            
-        }
+        
+        
         
         public async void Start()
         {
@@ -104,7 +97,7 @@ namespace KursovWork
                     _isStarted = true;
 
                 var grammarBuilder = new GrammarBuilder();
-                grammarBuilder.Append(new Choices("Can you find in Google", "Stop recognition", "open program", "Save settings", "Help"));
+                grammarBuilder.Append(new Choices("Can you find in Google", "Stop recognition", "open program", "Help"));
                 var grammar = new Grammar(grammarBuilder);
                 recognizer.LoadGrammar(grammar);
                 recognizer.SetInputToDefaultAudioDevice();
@@ -114,7 +107,7 @@ namespace KursovWork
             
                 DefaultRecognizerQuery();
 
-                synth.Speak("Hi, I'm your voice assistant. If you need help for use me just say help");
+                synth.Speak($"Hi {nameUser}, I'm your voice assistant. If you need help for use me just say help");
 
                 activateSound.Play();
             
@@ -140,23 +133,21 @@ namespace KursovWork
             recognizerQuery.LoadGrammar(new DictationGrammar());    
         }
         public void ChangeSpeachConfiguration(VoiceGender voiceGender, VoiceAge voiceAge, int voiceSpeed)
-        {   
+        {
+            
                 synth.SelectVoiceByHints(voiceGender, voiceAge);
                 synth.Rate = voiceSpeed;   
         }
 
-        private void OpenConfiguration(string projectPath)
+        public void SetConfiguration(XmlDocument config)
         {
 
-            activateSound = new(projectPath + "\\Sounds\\Activate Voice.mp3");
+            activateSound = new(Directory.GetCurrentDirectory() + "\\Sounds\\Activate Voice.mp3");
 
             openCommands = new();
             try
             {
-                XmlDocument xmlDoc = new XmlDocument();
-                xmlDoc.Load(projectPath + "\\Configuration.xml");
-
-                XmlNode settingsNode = xmlDoc.SelectSingleNode("/Settings");
+                XmlNode settingsNode = config.SelectSingleNode("/Settings");
                 int voiceGender = int.Parse(settingsNode.SelectSingleNode("VoiceGender").InnerText);
                 int voiceAge = int.Parse(settingsNode.SelectSingleNode("VoiceAge").InnerText);
                 int voiceSpeed = int.Parse(settingsNode.SelectSingleNode("VoiceSpeed").InnerText);
@@ -166,7 +157,7 @@ namespace KursovWork
                 
                 
 
-                XmlNodeList openCommandsTMP = xmlDoc.SelectNodes("/Settings/OpenCommand");
+                XmlNodeList openCommandsTMP = config.SelectNodes("/Settings/OpenCommand");
                 foreach (XmlNode openCommand in openCommandsTMP)
                 {
                     string programName = openCommand.SelectSingleNode("programName").InnerText;
@@ -230,15 +221,10 @@ namespace KursovWork
                 AddChoicesForQuery();
                 recognizerQuery.RecognizeAsync(RecognizeMode.Multiple);
             }
-            else if (e.Result.Text == "Save settings")
-            {
-                synth.Speak("Settings saved");
-                SaveConfiguration();
-            }
+            
             else if (e.Result.Text == "Stop recognition")
             {
                 synth.Speak("OK, bye!");
-                SaveConfiguration();
                 Environment.Exit(0);
             }
             else if (e.Result.Text == "Help")
@@ -247,7 +233,7 @@ namespace KursovWork
             } 
         }
 
-        public void SaveConfiguration()
+        public XmlDocument GetXmlConfig()
         {
             XmlDocument xmlDoc = new XmlDocument();
 
@@ -281,7 +267,7 @@ namespace KursovWork
                 rootElement.AppendChild(openCommandElement);
             }
 
-            xmlDoc.Save(pathToConfig + "\\Configuration.xml");
+            return xmlDoc;
         }
 
 
@@ -317,7 +303,7 @@ namespace KursovWork
             DefaultRecognizerQuery();
         }
 
-        private async void SearchInGoogle(string query)
+        private void SearchInGoogle(string query)
         {
 
             string url = $"https://www.google.com/search?q={Uri.EscapeDataString(query)}";

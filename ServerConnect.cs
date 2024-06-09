@@ -1,21 +1,23 @@
 ﻿using Microsoft.Data.SqlClient;
 using System.Data;
 using System.Data.SqlTypes;
+using System.Reflection.PortableExecutable;
 using System.Security.Cryptography;
 using System.Text;
+using System.Xml;
 namespace Testing_for_WEB
 {
     public partial class ServerConnect
     {
-        public string connectingString = "Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\LogicMan\\source\\repos\\Server\\Users.mdf;Integrated Security=True";
+        public string _connectionString = "Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\LogicMan\\source\\repos\\Server\\Users.mdf;Integrated Security=True";
         SqlConnection _connection;
         public ServerConnect() {
-            _connection = new(connectingString);
+            _connection = new(_connectionString);
             _connection.Open(); 
         }
        
 
-        public bool AddUser(string login, string password, SqlXml sqlXml)
+        public bool AddUser(string login, string password, XmlDocument config)
         {
             password = HashPassword(password);
             string query = "INSERT INTO Users (Login, Password, XmlConfig) VALUES (@login, @password, @xmlConfig)";
@@ -26,7 +28,7 @@ namespace Testing_for_WEB
                 {
                     command.Parameters.AddWithValue("@login", login);
                     command.Parameters.AddWithValue("@password", password);
-                    command.Parameters.AddWithValue("@xmlConfig", sqlXml);
+                    command.Parameters.AddWithValue("@xmlConfig", ConvertToSqlXml(config));
 
                     int rowsAffected = command.ExecuteNonQuery();
                     return rowsAffected > 0;
@@ -45,25 +47,70 @@ namespace Testing_for_WEB
                 return false;
             }
         }
-        public SqlXml SingIn(string Login, string Password)
+        public XmlDocument SignIn(string Login, string Password)
         {
-            SqlXml config = new();
-            string query = $"SELECT * FROM Users Where Login = {Login}";
+            XmlDocument config = null;
+            string query = "SELECT xmlConfig FROM Users WHERE Login = @Login AND Password = @Password";
 
-            using (SqlCommand command = new(query, _connection))
+            try
             {
-                SqlDataReader reader = command.ExecuteReader();
-                reader.Read();
-                if ((string)reader["password"] == HashPassword(Password))
+                using (SqlCommand command = new SqlCommand(query, _connection))
                 {
-                    config = (SqlXml)reader["xmlConfig"];
+                    command.Parameters.AddWithValue("@Login", Login);
+                    command.Parameters.AddWithValue("@Password", HashPassword(Password));
 
+                    // Получение xmlConfig как SqlXml
+                    SqlDataReader reader = command.ExecuteReader();
+                    reader.Read();
+
+                    if (!reader.IsDBNull(reader.GetOrdinal("xmlConfig")))
+                    {
+                        SqlXml xmlValue = reader.GetSqlXml(reader.GetOrdinal("xmlConfig"));
+                        
+                        config = new XmlDocument();
+                        config.LoadXml(xmlValue.Value);
+                    }
                 }
             }
+            catch (SqlException ex)
+            {
+                Console.WriteLine("SQL Error: " + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error: " + ex.Message);
+            }
+            
+
             return config;
+        }
 
+        public bool SaveConfig(string Login, XmlDocument config)
+        {
+            string updateQuery = "UPDATE Users SET xmlConfig = @xmlConfig WHERE Login = @login";
 
+            using (SqlCommand command = new SqlCommand(updateQuery, _connection))
+            {
+                // Параметр @login
+                command.Parameters.AddWithValue("@login", Login);
 
+                // Конвертация XmlDocument в SqlXml
+                SqlXml sqlXml = ConvertToSqlXml(config);
+
+                // Параметр @xmlConfig
+                command.Parameters.Add("@xmlConfig", SqlDbType.Xml).Value = sqlXml;
+
+                int rowsAffected = command.ExecuteNonQuery();
+                return rowsAffected > 0;
+            }
+        }
+        private SqlXml ConvertToSqlXml(XmlDocument xmlDocument)
+        {
+            // Преобразование объекта XmlDocument в строку XML
+            string xmlString = xmlDocument.OuterXml;
+
+            // Создание объекта SqlXml из строки XML
+            return new SqlXml(new XmlTextReader(xmlString, XmlNodeType.Document, null));
         }
 
         private string HashPassword(string password)
