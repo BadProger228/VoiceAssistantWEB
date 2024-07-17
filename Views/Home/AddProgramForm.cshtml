@@ -1,40 +1,125 @@
-﻿
-@model AllPageConfiguration
+﻿@model AllPageConfiguration
 @using System.Speech.Synthesis
 @using Testing_for_WEB.Controllers
 @using static KursovWork.VoiceAssistant
 
+<!DOCTYPE html>
 <html>
-    <body>
-        <header>
+<head>
+    <link rel="stylesheet" type="text/css" href="/css/AddProgramForm.css">
+</head>
+<body>
+    <header>
             <div class="row mt-5">
                 <div class="row">
                     <div class="col-md-6">
                         <h2>Program List</h2>
-                        <select id="ProgramList" class="form-control" size="5">
-                            Model = HomeController.Index();
-                            @foreach (var program in Model.ProgramList)
-                            {
-                                <option value="@program.FileName">@program.FileName</option>
-                            }
-                        </select>
-                        <div id="DeleteMessage" style="color: red;"></div>
-                        <button id="DeleteItem" class="btn btn-danger mt-2">Delete selected program</button>
+                        <form method="post" action="/Home/DeleteProgram" id="deleteForm">
+                            <select id="ProgramList" class="form-control" size="5" name="NameProgram">
+                                @foreach (var program in Model.ProgramList)
+                                {
+                                    <option value="@program.FileName">@program.FileName</option>
+                                }
+                            </select>
+                            <div id="DeleteMessage"></div>
+                            <button type="submit" class="dropbtn delete-btn" id="DeleteItem">Delete selected program</button>
+                        </form>
                     </div>
 
                     <div class="col-md-6">
                         <form method="post" action="/Home/AddProgram">
                             <h2>Add Program</h2>
                             <label for="NameProgram">Name:</label>
-                            <input type="text" name="NameProgram" class="form-control mb-2">
+                            <input type="text" name="NameProgram">
                             <label for="pathToProgram">Path:</label>
-                            <input type="text" name="pathToProgram" class="form-control mb-2">
+                            <input type="text" name="pathToProgram">
                             <div id="AddProgramMessage"></div>
-                            <button onclick="this.form.submit()" id="AddOpenProgram" class="btn btn-primary">Add Program</button>
+                            <button class="dropbtn" onclick="this.form.submit()" id="AddOpenProgram">Add Program</button>
                         </form>
                     </div>
                 </div>
             </div>
-        </header>
-    </body>
+        
+    </header>
+    <script type="text/javascript">
+        document.getElementById("DeleteItem").addEventListener("click", function () {
+            var programList = document.getElementById("ProgramList");
+            var selectedOption = programList.options[programList.selectedIndex];
+            var errorMessageDiv = document.getElementById("DeleteMessage");
+
+            if (selectedOption) {
+                var fileName = selectedOption.value;
+
+                selectedOption.remove();
+
+                fetch('/Home/DeleteProgram?NameProgram=' + fileName, {
+                    method: 'POST'
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            console.log('Program deleted successfully');
+                            errorMessageDiv.textContent = '';
+                        } else {
+                            console.error('Error deleting program');
+                            errorMessageDiv.textContent = 'Error deleting program';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error deleting program:', error);
+                        errorMessageDiv.textContent = 'Error deleting program: ' + error;
+                    });
+            } else {
+                console.log('No program selected');
+                errorMessageDiv.textContent = 'No program selected';
+            }
+        });
+    </script>
+    <script type="text/javascript">
+        document.getElementById("AddOpenProgram").addEventListener("click", function (event) {
+            event.preventDefault();
+
+            var nameProgramInput = document.querySelector('input[name="NameProgram"]');
+            var nameProgramValue = nameProgramInput.value;
+
+            var pathToProgramInput = document.querySelector('input[name="pathToProgram"]');
+            var pathToProgramValue = pathToProgramInput.value;
+
+            var messageLabel = document.getElementById("AddProgramMessage");
+            messageLabel.innerHTML = '';
+
+            if (nameProgramValue.trim() !== "") {
+                var programList = document.getElementById("ProgramList");
+                var existingOptions = programList.querySelectorAll('option');
+                var isDuplicate = Array.from(existingOptions).some(function (option) {
+                    return option.value === nameProgramValue;
+                });
+
+                if (!isDuplicate) {
+                    var newOption = document.createElement('option');
+                    newOption.value = nameProgramValue;
+                    newOption.textContent = nameProgramValue;
+                    programList.appendChild(newOption);
+
+                    nameProgramInput.value = '';
+                    pathToProgramInput.value = '';
+                    var successMessage = document.createElement('div');
+                    successMessage.textContent = 'Program added successfully';
+                    successMessage.style.color = 'green';
+                    messageLabel.appendChild(successMessage);
+                } else {
+                    var errorMessage = document.createElement('div');
+                    errorMessage.textContent = 'Program with this name already exists';
+                    errorMessage.style.color = 'red';
+                    messageLabel.appendChild(errorMessage);
+                }
+            } else {
+                var errorMessage = document.createElement('div');
+                errorMessage.textContent = 'Please enter a program name';
+                errorMessage.style.color = 'red';
+                messageLabel.appendChild(errorMessage);
+            }
+        });
+    </script>
+</body>
 </html>
+

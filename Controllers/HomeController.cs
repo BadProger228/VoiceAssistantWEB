@@ -1,10 +1,12 @@
-﻿using KursovWork;
+﻿using Catharsis.Commons;
+using KursovWork;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Speech.Synthesis;
 using Testing_for_WEB.Models;
 using static KursovWork.VoiceAssistant;
+using System.Data.SqlTypes;
 
 namespace Testing_for_WEB.Controllers
 {
@@ -14,17 +16,25 @@ namespace Testing_for_WEB.Controllers
         public int Speed { get; set; }
         public VoiceAge Age { get; set; }
         public VoiceGender Gender { get; set; }
+        public bool IsPhone { get; set; } = false;
+        public string? pathToCSS { get; set; }
+        
     }
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IConfiguration _configuration;
         private VoiceAssistant _voiceAssistant;
+        private ServerConnect _serverConnect;
+        private AllPageConfiguration AllPageConfiguration { get; set; }
         public HomeController(ILogger<HomeController> logger, IConfiguration configuration, VoiceAssistant voiceAssistant)
         {
             _logger = logger;
             _configuration = configuration;
             _voiceAssistant = voiceAssistant;
+            _serverConnect = new();
+            _serverConnect.AddUser("Hello World", "pass", new SqlXml());
+            _serverConnect.SingIn("Hello World", "pass");
         }
 
         public AllPageConfiguration DataWebSite()
@@ -46,18 +56,28 @@ namespace Testing_for_WEB.Controllers
             return viewModel;
         }
 
-        [HttpGet]
         public IActionResult Index()
         {
-            return View(DataWebSite());
+            AllPageConfiguration = DataWebSite();
+            
+
+            return View(AllPageConfiguration);
         }
         public IActionResult AddProgramForm()
         {
-            return View(DataWebSite());
+
+            AllPageConfiguration = DataWebSite();
+           
+
+            return View(AllPageConfiguration);
         }
         public IActionResult Settings()
         {
-            return View(DataWebSite()); 
+
+            AllPageConfiguration = DataWebSite();
+            
+
+            return View(AllPageConfiguration); 
         }
 
         public IActionResult RedirectToPage(string button)
@@ -77,6 +97,10 @@ namespace Testing_for_WEB.Controllers
         }
         public IActionResult AddProgram(string NameProgram, string pathToProgram)
         {
+            foreach (var item in _voiceAssistant.openCommands)
+                if(item.FileName == NameProgram)
+                    return NoContent();
+            
             if(_voiceAssistant.SetOpenCommand(NameProgram, pathToProgram))
                 return NoContent();
             return NoContent();

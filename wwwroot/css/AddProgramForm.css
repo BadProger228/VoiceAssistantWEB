@@ -1,0 +1,173 @@
+﻿body {
+    margin: 0;
+    padding: 0;
+    font-family: Berlian Sans FB, sans-serif;
+    background-color: #1a1a1a;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    position: relative; /* Добавлено для позиционирования фонового контейнера */
+}
+
+.container {
+    background-color: #1e1e1e;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 1; /* Контейнер будет выше фонового контейнера */
+}
+
+.background-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #1e1e1e;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    width: 80%; /* Сделаем фоновый контейнер поуже */
+    max-width: 600px;
+    min-width: 300px;
+    z-index: 0; /* Контейнер будет на заднем фоне */
+}
+
+h2 {
+    margin-bottom: 20px;
+}
+
+ul {
+    padding: 0;
+    margin: 0;
+}
+
+    ul li {
+        list-style: none;
+        margin-bottom: 5px;
+    }
+
+.delete-btn, .add-btn {
+    background-color: transparent;
+    color: #00bfff;
+    border: 1px solid #00bfff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+    display: block;
+    margin-bottom: 20px;
+}
+
+    .delete-btn:hover, .add-btn:hover {
+        background-color: #00bfff;
+        color: #fff;
+    }
+
+.form-group {
+    margin-bottom: 10px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+input[type="text"] {
+    width: calc(100% - 22px);
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+button {
+    cursor: pointer;
+}
+
+    button:hover {
+        background-color: #333;
+    }
+
+input[type=text] {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+    box-sizing: border-box;
+    border: 1px solid #00bfff;
+    border-radius: 5px;
+    background-color: transparent;
+    color: #fff;
+}
+
+.dropbtn {
+    background-color: transparent;
+    color: #00bfff;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #00bfff;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+    .dropbtn:hover {
+        background-color: #00bfff;
+        color: #fff;
+        transition: background-color 0.3s, color 0.3s; /* Добавлено правило transition */
+    }
+
+#ProgramList {
+    background-color: #00bfff; /* Голубой фон */
+    color: #fff; /* Белый текст */
+    height: 165px;
+}
+
+    #ProgramList option {
+        background-color: #00bfff; /* Голубой фон */
+        color: #fff; /* Белый текст */
+    }
+
+.delete-btn {
+    margin-top: 8px; /* Отступ сверху */
+    font-size: 16px; /* Размер шрифта */
+    padding: 7px; /* Внутренние отступы */
+    border: 1px solid #00bfff;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Медиа-запросы для мобильных устройств */
+@media (max-width: 600px) {
+    .container {
+        padding: 10px;
+    }
+
+    .background-container {
+        padding: 10px;
+        width: 90%; /* Увеличим ширину для мобильных устройств */
+        max-width: none; /* Уберем максимальную ширину */
+    }
+
+    h2 {
+        font-size: 1.5em; /* Уменьшим размер заголовка */
+        margin-bottom: 15px;
+    }
+
+    .delete-btn, .add-btn {
+        padding: 8px 15px; /* Уменьшим внутренние отступы */
+    }
+
+    input[type="text"] {
+        padding: 8px;
+    }
+
+    .dropbtn {
+        padding: 8px;
+        font-size: 14px; /* Уменьшим размер шрифта */
+    }
+}

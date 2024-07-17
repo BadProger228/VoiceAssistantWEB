@@ -7,12 +7,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\css\AddProgramForm.css" />
+    <Content Remove="wwwroot\css\Settings.css" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\css\AddProgramForm.css" />
+    <None Include="wwwroot\css\Settings.css" />
     <None Include="wwwroot\css\Index.css" />
     <None Include="wwwroot\js\script.js" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Catharsis.Web.Widgets" Version="2.9.2" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.61" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.1" />
     <PackageReference Include="NAudio" Version="2.2.1" />
     <PackageReference Include="OpenQA.Selenium.Winium" Version="1.0.0.4" />
     <PackageReference Include="System.Speech" Version="8.0.0" />
