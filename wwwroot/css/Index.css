@@ -2,8 +2,8 @@
     margin: 0;
     padding: 0;
     font-family: Berlian Sans FB, sans-serif;
-    background-color: #1a1a1a; /* Темный фон */
-    color: #fff; /* Белый текст */
+    background-color: #1a1a1a;
+    color: #fff;
 }
 
 .container {
@@ -32,28 +32,58 @@ nav ul {
 
         nav ul li a {
             text-decoration: none;
-            color: #00bfff; /* Голубая обводка */
-            border: 1px solid #00bfff; /* Голубая обводка */
+            color: #00bfff;
+            border: 1px solid #00bfff;
             padding: 5px 10px;
             border-radius: 5px;
         }
 
             nav ul li a:hover {
-                background-color: #00bfff; /* Голубая обводка при наведении */
-                color: #fff; /* Белый текст при наведении */
+                background-color: #00bfff;
+                color: #fff;
             }
-
-/* Добавьте стили для контента на вкладках, таких как "Настройки" и "Программы" */
 
 footer {
     position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
-    background-color: #333; /* Цвет фона */
-    padding: 20px 0; /* Отступы сверху и снизу */
-    text-align: center; /* Выравнивание текста по центру */
-    color: #fff; /* Цвет текста */
-    font-family: Berlian Sans FB, sans-serif; /* Установка шрифта */
+    background-color: #333;
+    padding: 20px 0;
+    text-align: center;
+    color: #fff;
+    font-family: Berlian Sans FB, sans-serif;
 }
+
+/* Медиа-запросы для мобильных устройств */
+@media (max-width: 600px) {
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    nav ul {
+        width: 100%;
+        text-align: center;
+    }
+
+        nav ul li {
+            display: block;
+            margin-bottom: 10px;
+            margin-right: 0;
+        }
+
+            nav ul li a {
+                display: block;
+                padding: 10px;
+                width: 100%;
+            }
+
+    footer {
+        padding: 10px 0;
+    }
+
+    .container {
+        padding: 10px;
+    }
 }

@@ -1,10 +1,13 @@
-﻿using KursovWork;
+﻿using Catharsis.Commons;
+using KursovWork;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Speech.Synthesis;
 using Testing_for_WEB.Models;
 using static KursovWork.VoiceAssistant;
+using System.Data.SqlTypes;
+using System.Xml;
 
 namespace Testing_for_WEB.Controllers
 {
@@ -14,19 +17,60 @@ namespace Testing_for_WEB.Controllers
         public int Speed { get; set; }
         public VoiceAge Age { get; set; }
         public VoiceGender Gender { get; set; }
+        public bool IsPhone { get; set; } = false;
+        public string? pathToCSS { get; set; }
+        
     }
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IConfiguration _configuration;
         private VoiceAssistant _voiceAssistant;
+        private ServerConnect _serverConnect;
+        private AllPageConfiguration AllPageConfiguration { get; set; }
         public HomeController(ILogger<HomeController> logger, IConfiguration configuration, VoiceAssistant voiceAssistant)
         {
             _logger = logger;
             _configuration = configuration;
             _voiceAssistant = voiceAssistant;
+            _serverConnect = new();
         }
+        public IActionResult Register(string Username, string Password, string ConfirmPassword)
+        {
+            if (Password != ConfirmPassword)
+                return NoContent();
+            else if(Password.Length <= 4)
+                return NoContent();
 
+
+            _serverConnect.AddUser(Username, Password, SetDefoultValueForVoiceAssistant());
+            _voiceAssistant.SetConfiguration(_serverConnect.SignIn(Username, Password));
+            _voiceAssistant.nameUser = Username;
+            _voiceAssistant.Start();
+
+            return RedirectToAction("main");
+        }
+        private XmlDocument SetDefoultValueForVoiceAssistant()
+        {
+            XmlDocument xmlDoc = new XmlDocument();
+
+            XmlElement rootElement = xmlDoc.CreateElement("Settings");
+            xmlDoc.AppendChild(rootElement);
+
+            XmlElement voiceSpeedElement = xmlDoc.CreateElement("VoiceSpeed");
+            voiceSpeedElement.InnerText = "0";
+            rootElement.AppendChild(voiceSpeedElement);
+
+            XmlElement voiceGenderElement = xmlDoc.CreateElement("VoiceGender");
+            voiceGenderElement.InnerText = ((int)VoiceGender.NotSet).ToString();
+            rootElement.AppendChild(voiceGenderElement);
+
+            XmlElement voiceAgeElement = xmlDoc.CreateElement("VoiceAge");
+            voiceAgeElement.InnerText = ((int)VoiceAge.NotSet).ToString();
+            rootElement.AppendChild(voiceAgeElement);
+            
+            return xmlDoc;
+        }
         public AllPageConfiguration DataWebSite()
         {
             VoiceGender voiceGender = new();
@@ -46,10 +90,9 @@ namespace Testing_for_WEB.Controllers
             return viewModel;
         }
 
-        [HttpGet]
         public IActionResult Index()
         {
-            return View(DataWebSite());
+            return View();
         }
         public IActionResult AddProgramForm()
         {
@@ -58,6 +101,14 @@ namespace Testing_for_WEB.Controllers
         public IActionResult Settings()
         {
             return View(DataWebSite()); 
+        }
+        public IActionResult main()
+        {
+            return View(DataWebSite());
+        }
+        public IActionResult RegisterForm()
+        {
+            return View(DataWebSite());
         }
 
         public IActionResult RedirectToPage(string button)
@@ -77,8 +128,15 @@ namespace Testing_for_WEB.Controllers
         }
         public IActionResult AddProgram(string NameProgram, string pathToProgram)
         {
-            if(_voiceAssistant.SetOpenCommand(NameProgram, pathToProgram))
+            foreach (var item in _voiceAssistant.openCommands)
+                if(item.FileName == NameProgram)
+                    return NoContent();
+
+            if (_voiceAssistant.SetOpenCommand(NameProgram, pathToProgram))
+            {
+                _serverConnect.SaveConfig(_voiceAssistant.nameUser, _voiceAssistant.GetXmlConfig());
                 return NoContent();
+            }
             return NoContent();
         }
         public IActionResult DeleteProgram(string NameProgram) {
@@ -90,7 +148,7 @@ namespace Testing_for_WEB.Controllers
                     return NoContent();
                 }
             }
-            Error();
+            _serverConnect.SaveConfig(_voiceAssistant.nameUser, _voiceAssistant.GetXmlConfig());
             return NoContent();
         }
         public IActionResult Testing(string text)
@@ -100,7 +158,21 @@ namespace Testing_for_WEB.Controllers
         }
         public IActionResult ChangeVoiceConf(int Speed, string Age, string Gender) {
             _voiceAssistant.ChangeSpeachConfiguration((VoiceGender)Enum.Parse(typeof(VoiceGender), Gender), (VoiceAge)Enum.Parse(typeof(VoiceAge), Age), Speed);
+            _serverConnect.SaveConfig(_voiceAssistant.nameUser, _voiceAssistant.GetXmlConfig());
             return NoContent();
+        }
+        public IActionResult Login(string Login, string Password)
+        {
+            XmlDocument xmlDocument = _serverConnect.SignIn(Login, Password);
+            if (xmlDocument is null)
+                return NoContent();
+
+            _voiceAssistant.SetConfiguration(xmlDocument);
+            _voiceAssistant.nameUser = Login;
+            _voiceAssistant.Start();
+            return RedirectToAction("main");
+
+
         }
         public IActionResult Privacy()
         {

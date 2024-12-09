@@ -1,0 +1,36 @@
+﻿@model AllPageConfiguration
+@using System.Speech.Synthesis
+@using Testing_for_WEB.Controllers
+@using static KursovWork.VoiceAssistant
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" type="text/css" href="/css/Index.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Assistant Website</title>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Voice Assistant</h1>
+            <nav>
+                <ul>
+                    <li><a href="/Home/RedirectToPage?button=settings">Settings</a></li>
+                    <li><a href="/Home/RedirectToPage?button=Add programs">Add Programs</a></li>
+                </ul>
+            </nav>
+        </header>
+        <div class="text-content">
+            <p>Just say HELP if you need explain</p>
+            <p>Commands: </p>
+            <p>- can you find in Google => search in google that you will say</p>
+            <p>- open program => program ask name of program that you want to open => open program if you add it</p>
+        </div>
+    </div>
+    <footer>
+        <p>This Voice Assistant can help you open apps through voice input.</p>
+    </footer>
+</body>
+</html>

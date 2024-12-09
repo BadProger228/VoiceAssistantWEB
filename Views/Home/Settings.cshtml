@@ -3,47 +3,56 @@
 @using Testing_for_WEB.Controllers
 @using static KursovWork.VoiceAssistant
 
+<!DOCTYPE html>
 <html>
-    <body>
-        <header>
-            <div class="row mt-5">
-                <form metod="post" action="/Home/ChangeVoiceConf">
-                    <h2>Voice Settings</h2>
-                    <label for="SpeedValue">Speed:</label>
-                    <input type="range" name="Speed" class="form-control" min="-10" max="10" onchange="this.form.submit()" value="@Model.Speed">
-                    <label for="AgeValue">Age:</label>
-                    <select name="Age" class="form-control" onchange="this.form.submit()">
-                        @foreach (var value in Enum.GetValues(typeof(VoiceAge)))
-                        {
-                            <option value="@value">@value</option>
-                            if (value.ToString() == Model.Age.ToString())
-                            {
-                                <script>
-                                    document.getElementsByName("Age")[0].value = "@Model.Age";
-                                </script>
-                            }
-                        }
-                    </select>
-                    <label for="GenderValue">Gender:</label>
-                    <select name="Gender" class="form-control" onchange="this.form.submit()">
-                        @foreach (var value in Enum.GetValues(typeof(VoiceGender)))
-                        {
-                            <option value="@value">@value</option>
-                            if (value.ToString() == Model.Gender.ToString())
-                            {
-                                <script>
-                                    document.getElementsByName("Gender")[0].value = "@Model.Gender";
-                                </script>
-                            }
-                        }
-                    </select>
-                </form>
-                <form method="post" action="/Home/Testing">
-                    <h2>Testing of voice</h2>
-                    <input type="text" name="text">
-                    <input type="submit" value='Test' />
-                </form>
-            </div>
-        </header>
-    </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="/css/Settings.css">
+    <title>Title of the document</title>
+</head>
+<body>
+    <form method="post" action="/Home/ChangeVoiceConf">
+        <h2>Voice Settings</h2>
+        <div class="slider-container">
+            <label for="SpeedValue">Speed:</label>
+            <input type="range" name="Speed" min="-10" max="10" onchange="this.form.submit()" value="@Model.Speed">
+        </div>
+        <div class="select-container">
+            <label for="AgeValue">Age:</label>
+            <select name="Age" onchange="this.form.submit()">
+                @foreach (var value in Enum.GetValues(typeof(VoiceAge)))
+                {
+                    <option value="@value">@value</option>
+                    @if (value.ToString() == Model.Age.ToString())
+                    {
+                        <script>
+                            document.getElementsByName("Age")[0].value = "@Model.Age";
+                        </script>
+                    }
+                }
+            </select>
+        </div>
+        <div class="select-container">
+            <label for="GenderValue">Gender:</label>
+            <select name="Gender" onchange="this.form.submit()">
+                @foreach (var value in Enum.GetValues(typeof(VoiceGender)))
+                {
+                    <option value="@value">@value</option>
+                    @if (value.ToString() == Model.Gender.ToString())
+                    {
+                        <script>
+                            document.getElementsByName("Gender")[0].value = "@Model.Gender";
+                        </script>
+                    }
+                }
+            </select>
+        </div>
+        <form method="post" action="/Home/Testing">
+            <h2>Testing of voice</h2>
+            <input type="text" name="text">
+            <input type="submit" value="Test" class="test-btn" formaction="/Home/Testing">
+        </form>
+    </form>
+</body>
 </html>
