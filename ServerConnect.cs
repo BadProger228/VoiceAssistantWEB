@@ -36,13 +36,13 @@ namespace Testing_for_WEB
             }
             catch (SqlException ex)
             {
-                // Логирование ошибки SQL
+                
                 Console.WriteLine("SQL Error: " + ex.Message);
                 return false;
             }
             catch (Exception ex)
             {
-                // Логирование других ошибок
+               
                 Console.WriteLine("Error: " + ex.Message);
                 return false;
             }
@@ -59,7 +59,7 @@ namespace Testing_for_WEB
                     command.Parameters.AddWithValue("@Login", Login);
                     command.Parameters.AddWithValue("@Password", HashPassword(Password));
 
-                    // Получение xmlConfig как SqlXml
+                 
                     SqlDataReader reader = command.ExecuteReader();
                     reader.Read();
 
@@ -91,13 +91,13 @@ namespace Testing_for_WEB
 
             using (SqlCommand command = new SqlCommand(updateQuery, _connection))
             {
-                // Параметр @login
+              
                 command.Parameters.AddWithValue("@login", Login);
 
-                // Конвертация XmlDocument в SqlXml
+            
                 SqlXml sqlXml = ConvertToSqlXml(config);
 
-                // Параметр @xmlConfig
+           
                 command.Parameters.Add("@xmlConfig", SqlDbType.Xml).Value = sqlXml;
 
                 int rowsAffected = command.ExecuteNonQuery();
@@ -106,10 +106,9 @@ namespace Testing_for_WEB
         }
         private SqlXml ConvertToSqlXml(XmlDocument xmlDocument)
         {
-            // Преобразование объекта XmlDocument в строку XML
+       
             string xmlString = xmlDocument.OuterXml;
 
-            // Создание объекта SqlXml из строки XML
             return new SqlXml(new XmlTextReader(xmlString, XmlNodeType.Document, null));
         }
 
